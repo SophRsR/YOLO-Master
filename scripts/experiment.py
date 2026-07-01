@@ -1,10 +1,15 @@
+import os
 from ultralytics import YOLO
+from ultralytics.utils import SETTINGS
+
+SETTINGS.update(wandb=True)
+os.environ["WANDB_PROJECT"] = "yolo-master-reproduce"
 
 model = YOLO("ultralytics/cfg/models/master/v0/det/yolo-master-n.yaml")
 model.train(
-    data='coco.yaml',
-    epochs=600,
-    batch=256,
-    imgsz=640)
-model.val(data='coco.yaml')
-results = model('../ultralytics/cfg/datasets/coco.yaml') 
+    data='coco8.yaml',
+    epochs=30,
+    batch=4,
+    imgsz=640,
+    device=0)
+model.val(data='coco8.yaml')
