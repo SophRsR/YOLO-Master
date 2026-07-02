@@ -646,6 +646,7 @@ class ES_MOE(nn.Module):
 
         # Initialize output
         final_output = torch.zeros_like(x)
+        weight_sum = torch.zeros_like(x[:, :1, :, :])
 
         # Iterate over experts (vectorized over batch)
         for expert_idx in range(self.num_experts):
@@ -672,7 +673,9 @@ class ES_MOE(nn.Module):
 
             # Accumulate
             final_output.index_add_(0, batch_indices, expert_out * weight)
+            weight_sum.index_add_(0, batch_indices, weight)
 
+        final_output = final_output / weight_sum.clamp_min(1e-6)
         return final_output
 
     def _compute_load_balancing_loss(self, routing_weights, eps=1e-6):
